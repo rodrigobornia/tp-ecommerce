@@ -1,5 +1,41 @@
 package Producto;
 
-public abstract class Producto {
+import Visitor.ReporteVisitor;
+import Visitor.Visitable;
 
+public abstract class Producto implements Visitable {
+	private  String nombre;
+	private  String descripcion;
+	private  double precioBase;
+	private  int stock;
+	
+	
+	public abstract Double precioFinal();
+	
+	@Override
+	public void accept(ReporteVisitor visitor) {
+		visitor.visitProducto(this);
+	}
+	
+	
+	
+	//GETTERS----------------------------------------
+	
+	public String getNombre() {
+		return nombre;
+	}
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public double getPrecioBase() {
+		return precioBase;
+	}
+	public int getStock() {
+		return stock;
+	}
+
+	
+		
+		
+ 
 }
