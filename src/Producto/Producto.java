@@ -9,6 +9,12 @@ public abstract class Producto implements Visitable {
 	private  double precioBase;
 	private  int stock;
 	
+	public Producto(String nombre, String descripcion, double precioBase, int stock) {
+	    this.nombre = nombre;
+	    this.descripcion = descripcion;
+	    this.precioBase = precioBase;
+	    this.stock = stock;
+	}  
 	
 	public abstract Double precioFinal();
 	

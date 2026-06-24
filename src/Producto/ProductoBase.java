@@ -9,6 +9,17 @@ public class ProductoBase extends Producto {
 	private double peso;
 	private ArrayList<AtributoDinamico> atributos = new ArrayList<AtributoDinamico>();
 	
+	
+	
+	
+	public ProductoBase(int SKU, String nombre, String descripcion,
+            String marca, String categoria, Double precio, Integer stock) {
+	super(nombre, descripcion, precio, stock); // <-- Pasamos los datos al padre
+	this.SKU = SKU;
+	this.marca = marca;
+	this.categoria = categoria;
+}
+
 	@Override 
 	public Double precioFinal() {
 		return this.getPrecioBase();

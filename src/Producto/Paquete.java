@@ -10,6 +10,12 @@ public class Paquete extends Producto {
 	private List<Producto> productos = new ArrayList<>(); 
 	
 	
+	
+	public Paquete(String nombre, String descripcion, int descuento,double precio, Integer stock) {
+	    super(nombre, descripcion,precio, stock); // <-- Pasamos los datos al padre
+	    this.descuento = descuento;
+	}
+
 	@Override
 	public void accept(ReporteVisitor visitor) {
 		visitor.visitPaquete(this);
@@ -29,4 +35,10 @@ public class Paquete extends Producto {
 	public int getDescuento() {
 		return descuento;
 	}
+
+	public List<Producto> getProductos() {
+		return productos;
+	}
+
+	
 }
