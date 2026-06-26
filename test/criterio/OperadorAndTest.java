@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-import Producto.Producto;
+import producto.Producto;
 
 public class OperadorAndTest {
 

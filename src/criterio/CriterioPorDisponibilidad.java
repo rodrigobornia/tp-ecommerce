@@ -3,7 +3,7 @@ package criterio;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import Producto.Producto;
+import producto.Producto;
 
 public class CriterioPorDisponibilidad implements Criterio{
 

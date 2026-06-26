@@ -2,7 +2,7 @@ package criterio;
 
 import java.util.List;
 
-import Producto.Producto;
+import producto.Producto;
 
 public interface Criterio {
 

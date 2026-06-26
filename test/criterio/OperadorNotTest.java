@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import Producto.Producto;
+import producto.Producto;
 
 
 public class OperadorNotTest {

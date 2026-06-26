@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import Producto.Producto;
+import producto.Producto;
 
 public class OperadorOr implements Criterio{
 	
