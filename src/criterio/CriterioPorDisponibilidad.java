@@ -1,6 +1,7 @@
 package criterio;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import Producto.Producto;
 
@@ -9,7 +10,7 @@ public class CriterioPorDisponibilidad implements Criterio{
 	@Override
 	public List<Producto> filtrar(List<Producto> listaDeProductos) {
 		// TODO Auto-generated method stub
-		return null;
+		return listaDeProductos.stream().filter(producto -> producto.getStock() > 0).collect(Collectors.toList());
 	}
 
 	@Override

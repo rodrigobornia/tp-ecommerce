@@ -1,15 +1,26 @@
 package criterio;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import Producto.Producto;
 
 public class CriterioPorNombre implements Criterio {
+	
+	String nombre;
+	
+	public CriterioPorNombre(String nombreFiltro) {
+		this.nombre = nombreFiltro;
+	}
 
 	@Override
 	public List<Producto> filtrar(List<Producto> listaDeProductos) {
 		// TODO Auto-generated method stub
-		return null;
+		return listaDeProductos.stream()
+				.filter(producto -> producto.getNombre()
+						.toLowerCase()
+						.contains(this.nombre.toLowerCase()))
+				.collect(Collectors.toList());
 	}
 
 	@Override

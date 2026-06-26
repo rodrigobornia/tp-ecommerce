@@ -11,8 +11,8 @@ public class Paquete extends Producto {
 	
 	
 	
-	public Paquete(String nombre, String descripcion, int descuento,double precio, Integer stock) {
-	    super(nombre, descripcion,precio, stock); // <-- Pasamos los datos al padre
+	public Paquete(String nombre, String descripcion, int descuento, String categoria, double precio, Integer stock) {
+	    super(nombre, descripcion,categoria,precio, stock); // <-- Pasamos los datos al padre
 	    this.descuento = descuento;
 	}
 
