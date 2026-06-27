@@ -1,5 +1,5 @@
 package pedido;
 
-public class Entregado {
+public class Entregado extends EstadoDePedido {
 
 }
