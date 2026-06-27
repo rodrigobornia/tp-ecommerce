@@ -1,5 +1,5 @@
 package pedido;
 
-public class Cancelado {
+public class Cancelado extends EstadoDePedido{
 
 }
