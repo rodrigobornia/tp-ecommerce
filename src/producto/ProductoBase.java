@@ -13,31 +13,37 @@ public class ProductoBase extends Producto {
 	
 	
 	
-	public ProductoBase(int SKU, String nombre, String descripcion,
-            String marca, String categoria, Double precio, Integer stock) {
-	super(nombre, descripcion, categoria, precio, stock); // <-- Pasamos los datos al padre
+	public ProductoBase(int SKU, String nombre, String descripcion,String marca, String categoria, Double precio, int descuento,int stock) {
+	super(nombre, descripcion, categoria, precio, descuento ,stock); // <-- Pasamos los datos al padre
 	this.SKU = SKU;
 	this.marca = marca;
 }
 
 	@Override 
 	public Double precioFinal() {
-		return this.getPrecioBase();
+		return this.getPrecioBase() * (1 - this.getDescuento() / 100); 
 	}
 	@Override
 	public void accept(ReporteVisitor visitor) {
 		visitor.visitProductoBase(this);
 	}
-/*	VER ESTOOO
- * public boolean esValido() {
 
-        if (this.SKU <= 0) return false; 
-        if (this.getNombre() == null || this.getNombre().isEmpty()) return false;
-        
-     
-        return true; // Si pasó todos los controles, el producto es válido
-    }
-*/
+	public void validarItem() {
+		if (!esItemValido()) {
+			throw new RuntimeException("No es un producto válido");
+		}
+	}
+	public Boolean esItemValido() {
+	    return (this.SKU > 0)                                                    &&   
+	           (this.getNombre() != null && !this.getNombre().isBlank())         && 
+	           (this.getDescripcion() != null && !this.getDescripcion().isBlank()) && 
+	           (this.marca != null && !this.marca.isBlank())                     && 
+	           (this.getCategoria() != null && !this.getCategoria().isBlank())   && 
+	           (this.getPrecioBase() > 0)                                        && 
+	           (this.getStock() >= 0)                                            && 
+	           (this.peso > 0);
+	}
+
 	public void agregarAtributo(String nombre, String descripcion) {
 		this.atributos.add(new AtributoDinamico(nombre, descripcion));
 	}

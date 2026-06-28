@@ -12,11 +12,14 @@ public abstract class Producto implements Visitable {
 	private  double precioBase;
 	private  int stock;
 	private String categoria;
-	
-	public Producto(String nombre, String descripcion, String categoria, double precioBase, int stock) {
+	private int descuento;
+
+
+	public Producto(String nombre, String descripcion, String categoria, double precioBase,int descuento, int stock) {
 	    this.nombre = nombre;
 	    this.descripcion = descripcion;
 	    this.precioBase = precioBase;
+	    this.descuento = descuento;
 	    this.stock = stock;
 	    this.categoria = categoria;
 	}  
@@ -29,6 +32,13 @@ public abstract class Producto implements Visitable {
 	
 	
 	//GETTERS----------------------------------------
+	public int getDescuento() {
+		return descuento;
+	}
+	
+	public void setDescuento(int descuento) {
+		this.descuento = descuento;
+	}
 	
 	public String getNombre() {
 		return nombre;
