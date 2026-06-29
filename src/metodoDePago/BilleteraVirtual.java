@@ -4,16 +4,16 @@ import java.util.Map;
 
 public class BilleteraVirtual extends MetodoDePago {
     
-    public interface APIBV {
+    public interface APIBilleteraVirtual {
         boolean verificarSaldo(String idUsuario, double monto);
         String bloquearSaldo(String idUsuario, double monto);
         String acreditarFondos(String idVendedor, double monto);
-        void enviarNotificacionPush(String idUsuario, String mensaje);
+        void enviarNotificacionPush(String mensaje);
     }
     
-    private APIBV api;
+    private APIBilleteraVirtual api;
     
-    public BilleteraVirtual(APIBV api) {
+    public BilleteraVirtual(APIBilleteraVirtual api) {
         this.api = api;
     }
     
@@ -48,4 +48,11 @@ public class BilleteraVirtual extends MetodoDePago {
         }
         return transaccionId;
     }
+    
+    @Override
+    protected void notificar(String transaccionId) {
+        
+        api.enviarNotificacionPush("Pago realizado con éxito. ID: " + transaccionId);
+    }
+    
 }

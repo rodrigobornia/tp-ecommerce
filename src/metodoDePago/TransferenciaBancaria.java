@@ -4,15 +4,15 @@ import java.util.Map;
 
 public class TransferenciaBancaria extends MetodoDePago {
     
-    public interface APITB {
+    public interface APITransferenciaBancaria {
         boolean validarCBU(String cbu, String alias);
         String ejecutarTransferencia(double monto, String cbuOrigen, String cbuDestino);
         boolean esTransferenciaProgramada();
     }
     
-    private APITB api;
+    private APITransferenciaBancaria api;
     
-    public TransferenciaBancaria(APITB api) {
+    public TransferenciaBancaria(APITransferenciaBancaria api) {
         this.api = api;
     }
     
