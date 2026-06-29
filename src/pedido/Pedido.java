@@ -7,7 +7,7 @@ import producto.Producto;
 
 public class Pedido {
 	
-	
+	private List <ObservadorPedido> observers = new ArrayList<>(); 
 	private EstadoDePedido estado = new Borrador();
 	List<Producto> productos = new ArrayList<>();
 
@@ -98,5 +98,15 @@ public class Pedido {
 		// TODO Auto-generated method stub
 		return  null;
 	}
+	
+	public void notificarObservers(EstadoDePedido anterior, EstadoDePedido nuevo) {
+		observers.forEach(o -> o.notificar(anterior, nuevo, this));
+    }
+    public void agregarObserver(ObservadorPedido obs) {
+        observers.add(obs);
+    }
+    public void quitarObserver(ObservadorPedido obs) {
+        observers.remove(obs);
+    }
 
 }
