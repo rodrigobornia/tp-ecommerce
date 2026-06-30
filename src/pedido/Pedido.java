@@ -55,8 +55,9 @@ public class Pedido {
 	}
 
 	public void preparar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.preparar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public EstadoDePedido getEstado() {
@@ -65,23 +66,27 @@ public class Pedido {
 	}
 
 	public void cancelar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.cancelar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public void confirmar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.confirmar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public void enviar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.enviar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public void entregar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.entregar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public Double valorTotal() {
