@@ -21,7 +21,7 @@ public class ProductoBase extends Producto {
 
 	@Override 
 	public Double precioFinal() {
-		return this.getPrecioBase() * (1 - this.getDescuento() / 100); 
+		return this.getPrecioBase() * (1 - this.getDescuento() / 100.0); 
 	}
 	@Override
 	public void accept(ReporteVisitor visitor) {

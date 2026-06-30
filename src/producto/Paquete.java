@@ -37,4 +37,12 @@ public class Paquete extends Producto {
 	public  double getPeso() {
 		return this.productos.stream().mapToDouble(Producto::getPeso).sum();
 	}
+	
+	public void agregarProducto(Producto producto) {
+	    this.productos.add(producto);
+	}
+
+	public void quitarProducto(Producto producto) {
+	    this.productos.remove(producto);
+	}
 }
