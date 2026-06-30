@@ -11,6 +11,7 @@ public abstract class Producto implements Visitable {
 	private  String descripcion;
 	private  double precioBase;
 	private  int stock;
+	private double peso;
 	private String categoria;
 	private int descuento;
 
@@ -57,6 +58,10 @@ public abstract class Producto implements Visitable {
 		return categoria;
 	}
 
+	public double getPeso() {
+		return peso;
+	}	
+	
 	
 		
 		

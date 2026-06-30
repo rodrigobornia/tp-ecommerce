@@ -6,11 +6,11 @@ import java.util.List;
 import producto.Producto;
 
 public class Pedido {
-	
+	private String direccionDestino;
 	private List <ObservadorPedido> observers = new ArrayList<>(); 
 	private EstadoDePedido estado = new Borrador();
 	List<Producto> productos = new ArrayList<>();
-
+	 
 	
 	public void agregarItem(Producto p) {
 		estado.agregarItem(this, p);
@@ -90,19 +90,20 @@ public class Pedido {
 	}
 
 	public Double valorTotal() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.productos.stream()
+                .mapToDouble(Producto::precioFinal)
+                .sum();
 	}
 
+	
 	public String getDireccionDestino() {
-		// TODO Auto-generated method stub
-		return null;
+		return direccionDestino;
 	}
 
 	public double getPesoTotal() {
-		// TODO Auto-generated method stub
-		return  null;
-	}
+		
+		   return this.productos.stream().mapToDouble(Producto::getPeso).sum();
+	} 
 	
 	public void notificarObservers(EstadoDePedido anterior, EstadoDePedido nuevo) {
 		observers.forEach(o -> o.notificar(anterior, nuevo, this));

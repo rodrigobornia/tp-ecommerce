@@ -16,5 +16,9 @@ public class AtributoDinamico {
 	public String getDescripcion() {
 		return descripcion;
 	}
+	public boolean esValido() {
+	    return (this.nombre != null && !this.nombre.isBlank()) &&
+	           (this.descripcion != null && !this.descripcion.isBlank());
+	}
 
 }

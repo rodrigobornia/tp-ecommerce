@@ -7,7 +7,7 @@ import visitor.ReporteVisitor;
 public class ProductoBase extends Producto {
 	private int SKU;		
 	private String marca;
-	private double peso;
+	
 	private ArrayList<AtributoDinamico> atributos = new ArrayList<AtributoDinamico>();
 	
 	
@@ -34,14 +34,11 @@ public class ProductoBase extends Producto {
 		}
 	}
 	public Boolean esItemValido() {
-	    return (this.SKU > 0)                                                    &&   
-	           (this.getNombre() != null && !this.getNombre().isBlank())         && 
-	           (this.getDescripcion() != null && !this.getDescripcion().isBlank()) && 
-	           (this.marca != null && !this.marca.isBlank())                     && 
-	           (this.getCategoria() != null && !this.getCategoria().isBlank())   && 
-	           (this.getPrecioBase() > 0)                                        && 
-	           (this.getStock() >= 0)                                            && 
-	           (this.peso > 0);
+	    return (this.SKU > 0)                                                   &&   
+	           (this.getNombre() != null && !this.getNombre().isBlank())   		&&
+	           (this.atributos != null)                                         &&
+	           (this.atributos.stream().allMatch(AtributoDinamico::esValido));
+	         
 	}
 
 	public void agregarAtributo(String nombre, String descripcion) {
@@ -57,10 +54,7 @@ public class ProductoBase extends Producto {
 	public String getMarca() {
 		return marca;
 	}
-
-	public double getPeso() {
-		return peso;
-	}
+	
 
 	public ArrayList<AtributoDinamico> getAtributos() {
 		return atributos;

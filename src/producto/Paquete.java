@@ -33,6 +33,8 @@ public class Paquete extends Producto {
 	public List<Producto> getProductos() {
 		return productos;
 	}
-
-	
+	@Override
+	public  double getPeso() {
+		return this.productos.stream().mapToDouble(Producto::getPeso).sum();
+	}
 }
