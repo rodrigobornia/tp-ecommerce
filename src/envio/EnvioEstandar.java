@@ -6,6 +6,13 @@ import pedido.Pedido;
 
 public class EnvioEstandar extends MetodoDeEnvio{
 	private CorreoArgentino correoArgentino;
+
+	
+	public EnvioEstandar(CorreoArgentino correoArgentino) {
+		super();
+		this.correoArgentino = correoArgentino;
+	}
+
 	@Override
 	public double calcularCostoEnvio(Pedido pedido) {
 		return correoArgentino.estimarEnvio(pedido.getPesoTotal(), pedido.getDireccionDestino());
@@ -17,4 +24,7 @@ public class EnvioEstandar extends MetodoDeEnvio{
         // Para simplificar, le sumamos 6 días corridos a la fecha actual
         return LocalDate.now().plusDays(6);
     }
+
+
+	
 }
