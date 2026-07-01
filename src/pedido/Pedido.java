@@ -1,5 +1,6 @@
 package pedido;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,9 +12,13 @@ public class Pedido {
 	private String direccionDestino;
 	private List <ObservadorPedido> observers = new ArrayList<>(); 
 	private EstadoDePedido estado = new Borrador();
+
     List<Producto> productos = new ArrayList<>();
 	private MetodoDeEnvio metodoEnvio;
 	private MetodoDePago metodoPago;
+
+	private LocalDate fecha ;
+
 	 
 	public Pedido(String direccionDestino, List<Producto> productos, MetodoDeEnvio metodoEnvio,
 					MetodoDePago metodoPago) {
@@ -85,7 +90,7 @@ public class Pedido {
 	}
 
 	public EstadoDePedido getEstado() {
-		// TODO Auto-generated method stub
+		
 		return this.estado;
 	}
 
@@ -138,5 +143,13 @@ public class Pedido {
     public void quitarObserver(ObservadorPedido obs) {
         observers.remove(obs);
     }
+
+	public LocalDate getFecha() {
+		return fecha;
+	}
+
+	public List<Producto> getProductos() {
+		return productos;
+	}
 
 }

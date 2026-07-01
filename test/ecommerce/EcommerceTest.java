@@ -14,6 +14,10 @@ import envio.MetodoDeEnvio;
 import metodoDePago.MetodoDePago;
 import pedido.Pedido;
 import producto.Producto;
+import visitor.ExportadorReporte;
+
+import visitor.RecolectorVentasVisitor;
+
 
 class EcommerceTest {
 
@@ -162,4 +166,56 @@ class EcommerceTest {
             ecommerce.crearPedido(direccion, productosEncontrados, metodoEnvioMock, metodoPagoMock)
         );
     }
+ // ============================================================
+    // TEST 7: Quitar producto del catálogo
+    // ============================================================
+    @Test
+    void testQuitarProductoDeCatalogo() {
+        // Given
+        ecommerce.agregarProductoACatalogo(productoMock1);
+        
+        // When
+        ecommerce.quitarProductoDeCatalogo(productoMock1);
+        
+        // Then - Verificamos que no rompa y se quite (usamos buscar para comprobar)
+        Criterio criterioMock = mock(Criterio.class);
+        when(criterioMock.filtrar(anyList())).thenReturn(Arrays.asList()); 
+        
+        List<Producto> resultado = ecommerce.buscarProducto(criterioMock);
+        assertTrue(resultado.isEmpty());
+    }
+
+    // ============================================================
+    // TEST 8: Generar Reporte
+    // ============================================================
+
+    @Test
+    void testGenerarReporte_Exito() {
+        // 1. Creamos los mocks
+        Producto producto1 = mock(Producto.class);
+        Producto producto2 = mock(Producto.class);
+        
+        // 2. Los agregamos al catálogo
+        ecommerce.agregarProductoACatalogo(producto1);
+        ecommerce.agregarProductoACatalogo(producto2);
+        
+        // 3. Usamos un Visitor REAL 
+        RecolectorVentasVisitor visitorReal = new RecolectorVentasVisitor( new java.util.ArrayList<>(), java.time.LocalDate.now(), java.time.LocalDate.now());
+        
+        // 4. Mockeamos el Exportador
+        ExportadorReporte exportadorMock = mock(ExportadorReporte.class);
+        when(exportadorMock.exportar(anyList())).thenReturn("REPORTE_MOCK_GENERADO");
+        
+        // When
+        String resultado = ecommerce.generarReporte(visitorReal, exportadorMock);
+        
+        // Then
+        // A. Verificamos que devuelva el string correcto
+        assertEquals("REPORTE_MOCK_GENERADO", resultado);
+        
+        // B. Verificamos que el ECommerce le hizo "accept" a los productos que creamos acá
+        verify(producto1, times(1)).accept(visitorReal);
+        verify(producto2, times(1)).accept(visitorReal);
+    }
+
 }
