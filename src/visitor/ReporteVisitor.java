@@ -7,6 +7,5 @@ public interface ReporteVisitor {
 
 	public void visitProductoBase(ProductoBase productoBase);
 	public void visitPaquete (Paquete paquete);
-	String getReporteGenerado();
 
 }
