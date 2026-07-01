@@ -6,6 +6,12 @@ import pedido.Pedido;
 
 public class RetiroSucursal extends MetodoDeEnvio{
 	private Sucursal sucursalSeleccionada;
+	
+	
+	public RetiroSucursal(Sucursal sucursalSeleccionada) {
+		super();
+		this.sucursalSeleccionada = sucursalSeleccionada;
+	}
 	@Override
 	public double calcularCostoEnvio(Pedido pedido) {
 		return 0.0;
@@ -20,3 +26,4 @@ public class RetiroSucursal extends MetodoDeEnvio{
         }
     }
 }
+  

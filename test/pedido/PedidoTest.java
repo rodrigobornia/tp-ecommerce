@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import producto.Producto;
 
@@ -15,12 +16,25 @@ public class PedidoTest {
     
     @Mock
     private Producto productoMock;
-    
+    @Mock
+    private NotificadorEmail.MailSender mailSenderMock;
+    @Mock
+    private ObservadorPedido observerMock;
+    @Mock
+    private GeneradorFactura generadorFacturaMock;
+    @Mock
+    private Fidelizacion fidelizacionMock;
+
     private Pedido pedido;
+    private NotificadorEmail notificadorEmail;
     
     @BeforeEach
     void setUp() {
+    	MockitoAnnotations.openMocks(this);
+    	
         pedido = new Pedido();
+        notificadorEmail = new NotificadorEmail(mailSenderMock);
+        
     }
     
     // ============ TEST BORRADOR ============
@@ -344,4 +358,168 @@ public class PedidoTest {
         // Intentar preparar nuevamente desde Preparacion (no debería poder)
         assertThrows(RuntimeException.class, () -> pedido.preparar());
     }
+    
+    // -------------------- TESTS DE SUSCRIPCIÓN --------------------
+    
+    @Test
+    void testAgregarObserver_DeberiaAgregarALaLista() {
+        pedido.agregarObserver(generadorFacturaMock);
+        pedido.confirmar();
+        verify(generadorFacturaMock, times(1)).notificar(any(), any(), any());
+    }
+    
+    @Test
+    void testQuitarObserver_DeberiaQuitarDeLaLista() {
+        pedido.agregarObserver(generadorFacturaMock);
+        pedido.quitarObserver(generadorFacturaMock);
+        pedido.confirmar();
+        verify(generadorFacturaMock, never()).notificar(any(), any(), any());
+    }
+    
+    // -------------------- TESTS DE NOTIFICADOR EMAIL --------------------
+    
+    @Test
+    void testNotificadorEmail_DeberiaEnviarMailEnEstadosPermitidos() {
+        pedido.agregarObserver(notificadorEmail);
+        
+        // Confirmado y Enviado deben enviar mail
+        pedido.confirmar();
+        pedido.preparar();
+        pedido.enviar();
+        
+        verify(mailSenderMock, times(2))
+            .enviarMail(anyString(), anyString(), anyString(), anyString());
+    }
+    
+    @Test
+    void testNotificadorEmail_NoDeberiaEnviarMailEnEstadosNoPermitidos() {
+        pedido.agregarObserver(notificadorEmail);
+        
+        pedido.cancelar(); // Cancelado no envía mail
+        
+        verify(mailSenderMock, never())
+            .enviarMail(anyString(), anyString(), anyString(), anyString());
+    }
+    
+    // -------------------- TESTS DE GENERADOR FACTURA --------------------
+    
+    @Test
+    void testGeneradorFactura_DeberiaActuarSoloEnEntregado() {
+        pedido.agregarObserver(generadorFacturaMock);
+        
+        // Confirmado - NO debe generar factura
+        pedido.confirmar();
+        verify(generadorFacturaMock, times(1))
+            .notificar(any(), any(), any());
+        
+        pedido.preparar();
+        pedido.enviar();
+        // Entregado - SI debe generar factura
+        pedido.entregar();
+        verify(generadorFacturaMock, times(4)) //Se notifica 4 veces pero solo genera en entregado
+            .notificar(any(), any(), any());
+        
+    }
+    
+    // -------------------- TESTS DE FIDELIZACION --------------------
+    
+    @Test
+    void testFidelizacion_DeberiaActuarSoloEnCancelado() {
+        pedido.agregarObserver(fidelizacionMock);
+        
+        // Confirmado - NO debe enviar cupón
+        pedido.confirmar();
+        verify(fidelizacionMock, times(1))
+            .notificar(any(), any(), any());
+        
+        // Cancelado - SI debe enviar cupón
+        pedido.cancelar();
+        verify(fidelizacionMock, times(2)) // le llega dos veces la notificacion pero solo envia el mensaje en cancelar
+            .notificar(any(), any(), any());
+    }
+    
+    // -------------------- TESTS DE NOTIFICACIÓN MÚLTIPLE --------------------
+    
+    @Test
+    void testMultiplesObservadores_CuandoConfirmado_SoloEmail() {
+        pedido.agregarObserver(notificadorEmail);
+        pedido.agregarObserver(generadorFacturaMock);
+        pedido.agregarObserver(fidelizacionMock);
+        
+        pedido.confirmar();
+        
+        verify(mailSenderMock, times(1)).enviarMail(anyString(), anyString(), anyString(), anyString());
+        verify(generadorFacturaMock, times(1)).notificar(any(), any(), any());
+        verify(fidelizacionMock, times(1)).notificar(any(), any(), any());
+    }
+    
+    @Test
+    void testMultiplesObservadores_CuandoEntregado_EmailYFactura() {
+        pedido.agregarObserver(notificadorEmail);
+        pedido.agregarObserver(generadorFacturaMock);
+        pedido.agregarObserver(fidelizacionMock);
+        
+        pedido.confirmar();
+        pedido.preparar();
+        pedido.enviar();
+        pedido.entregar();
+        
+        verify(mailSenderMock, times(3)).enviarMail(anyString(), anyString(), anyString(), anyString());
+        verify(generadorFacturaMock, times(4)).notificar(any(), any(), any());
+        verify(fidelizacionMock, times(4)).notificar(any(), any(), any());
+    }
+    
+    @Test
+    void testMultiplesObservadores_CuandoCancelado_SoloFidelizacion() {
+        pedido.agregarObserver(notificadorEmail);
+        pedido.agregarObserver(generadorFacturaMock);
+        pedido.agregarObserver(fidelizacionMock);
+        
+        pedido.cancelar();
+        
+        verify(mailSenderMock, never()).enviarMail(anyString(), anyString(), anyString(), anyString());
+        verify(generadorFacturaMock, times(1)).notificar(any(), any(), any());
+        verify(fidelizacionMock, times(1)).notificar(any(), any(), any());
+    }
+    
+    // -------------------- TESTS DE FLUJO COMPLETO --------------------
+    
+    @Test
+    void testFlujoCompleto_ConfirmadoEnviadoEntregado_ConNotificaciones() {
+        pedido.agregarObserver(notificadorEmail);
+        pedido.agregarObserver(generadorFacturaMock);
+        pedido.agregarObserver(fidelizacionMock);
+        
+        pedido.confirmar();
+        pedido.preparar();
+        pedido.enviar();
+        pedido.entregar();
+        
+        // Email: 3 veces (Confirmado, Enviado, Entregado)
+        verify(mailSenderMock, times(3)).enviarMail(anyString(), anyString(), anyString(), anyString());
+        
+        // Factura: recibe 4 notificaciones pero solo actúa en Entregado
+        verify(generadorFacturaMock, times(4)).notificar(any(), any(), any());
+        
+        // Fidelización: recibe 4 notificaciones pero solo actúa en Cancelado
+        verify(fidelizacionMock, times(4)).notificar(any(), any(), any());
+    }
+    
+    @Test
+    void testFlujoCompleto_ConfirmadoCancelado_ConNotificaciones() {
+        pedido.agregarObserver(notificadorEmail);
+        pedido.agregarObserver(generadorFacturaMock);
+        pedido.agregarObserver(fidelizacionMock);
+        
+        pedido.confirmar();
+        pedido.cancelar();
+        
+        // Email: solo 1 vez (Confirmado)
+        verify(mailSenderMock, times(1)).enviarMail(anyString(), anyString(), anyString(), anyString());
+        
+        // Todos los observers reciben 2 notificaciones
+        verify(generadorFacturaMock, times(2)).notificar(any(), any(), any());
+        verify(fidelizacionMock, times(2)).notificar(any(), any(), any());
+    }
+
 }

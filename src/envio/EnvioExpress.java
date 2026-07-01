@@ -8,6 +8,13 @@ public class EnvioExpress extends MetodoDeEnvio{
 	
 	private  LibEnvioExpress envioExpress;
 	
+	
+	
+	public EnvioExpress(LibEnvioExpress envioExpress) {
+		super();
+		this.envioExpress = envioExpress;
+	}
+
 	@Override 
 	public  double calcularCostoEnvio(Pedido pedido) {
 		return envioExpress.calcularCosto(pedido.valorTotal());

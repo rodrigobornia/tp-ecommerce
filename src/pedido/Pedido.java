@@ -6,11 +6,11 @@ import java.util.List;
 import producto.Producto;
 
 public class Pedido {
-	
-	
+	private String direccionDestino;
+	private List <ObservadorPedido> observers = new ArrayList<>(); 
 	private EstadoDePedido estado = new Borrador();
 	List<Producto> productos = new ArrayList<>();
-
+	 
 	
 	public void agregarItem(Producto p) {
 		estado.agregarItem(this, p);
@@ -55,8 +55,9 @@ public class Pedido {
 	}
 
 	public void preparar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.preparar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public EstadoDePedido getEstado() {
@@ -65,38 +66,53 @@ public class Pedido {
 	}
 
 	public void cancelar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.cancelar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public void confirmar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.confirmar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public void enviar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.enviar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public void entregar() {
-		// TODO Auto-generated method stub
+		EstadoDePedido anterior = this.estado;
 		estado.entregar(this);
+		this.notificarObservers(anterior, this.estado);
 	}
 
 	public Double valorTotal() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.productos.stream()
+                .mapToDouble(Producto::precioFinal)
+                .sum();
 	}
 
+	
 	public String getDireccionDestino() {
-		// TODO Auto-generated method stub
-		return null;
+		return direccionDestino;
 	}
 
 	public double getPesoTotal() {
-		// TODO Auto-generated method stub
-		return  null;
-	}
+		
+		   return this.productos.stream().mapToDouble(Producto::getPeso).sum();
+	} 
+	
+	public void notificarObservers(EstadoDePedido anterior, EstadoDePedido nuevo) {
+		observers.forEach(o -> o.notificar(anterior, nuevo, this));
+    }
+    public void agregarObserver(ObservadorPedido obs) {
+        observers.add(obs);
+    }
+    public void quitarObserver(ObservadorPedido obs) {
+        observers.remove(obs);
+    }
 
 }
