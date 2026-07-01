@@ -104,8 +104,12 @@ class VisitorTest {
         ExportadorReporte exportador = new ExportadorCSV();
         String resultado = exportador.exportar(datos);
         
+        System.out.println("\n=== REPORTE CSV GENERADO ===");
+        System.out.println(resultado);
+        System.out.println("============================\n");
+        
         assertTrue(resultado.contains("Nombre_Item,Unidades_Vendidas,Precio_Promedio"));
-        assertTrue(resultado.contains("Termo,5,1000,00") || resultado.contains("Termo,5,1000.00")); // Depende del Locale (, o .)
+        assertTrue(resultado.contains("Termo,5,1000,00") || resultado.contains("Termo,5,1000.00")); 
     }
 
     @Test
@@ -116,12 +120,15 @@ class VisitorTest {
         
         ExportadorReporte exportador = new ExportadorTXT();
         String resultado = exportador.exportar(datos);
+       
+        System.out.println("\n=== REPORTE TXT GENERADO ===");
+        System.out.println(resultado);
+        System.out.println("============================\n");
         
         assertTrue(resultado.contains("=== REPORTE DE VENTAS ==="));
         assertTrue(resultado.contains("- Mate"));
         assertTrue(resultado.contains("Unidades: 2"));
     }
-
     @Test
     void testExportadorHTML() {
         List<ItemReporteDTO> datos = Arrays.asList(
@@ -131,8 +138,14 @@ class VisitorTest {
         ExportadorReporte exportador = new ExportadorHTML();
         String resultado = exportador.exportar(datos);
         
+   
+        System.out.println("\n=== REPORTE HTML GENERADO ===");
+        System.out.println(resultado);
+        System.out.println("=============================\n");
+
         assertTrue(resultado.contains("<!DOCTYPE html>"));
         assertTrue(resultado.contains("<td>Bombilla</td>"));
         assertTrue(resultado.contains("<td>10</td>"));
+    
     }
 }
