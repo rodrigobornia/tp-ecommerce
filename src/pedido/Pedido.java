@@ -3,14 +3,39 @@ package pedido;
 import java.util.ArrayList;
 import java.util.List;
 
+import envio.MetodoDeEnvio;
+import metodoDePago.MetodoDePago;
 import producto.Producto;
 
 public class Pedido {
 	private String direccionDestino;
 	private List <ObservadorPedido> observers = new ArrayList<>(); 
 	private EstadoDePedido estado = new Borrador();
-	List<Producto> productos = new ArrayList<>();
+    List<Producto> productos = new ArrayList<>();
+	private MetodoDeEnvio metodoEnvio;
+	private MetodoDePago metodoPago;
 	 
+	public Pedido(String direccionDestino, List<Producto> productos, MetodoDeEnvio metodoEnvio,
+					MetodoDePago metodoPago) {
+		this.direccionDestino = direccionDestino;
+		this.productos = productos;
+		this.metodoEnvio = metodoEnvio;
+		this.metodoPago = metodoPago;
+	}
+	
+	public void procesarPago() {
+		this.metodoPago.setMonto(this.getMontoTotal());
+		this.metodoPago.procesarPago();
+	}
+	
+	private double getMontoTotal() {
+		// TODO Auto-generated method stub
+		return productos.stream().mapToDouble(p ->p.precioFinal()).sum();
+	}
+
+	public void setMetodoPago(MetodoDePago metodoPago) {
+		this.metodoPago = metodoPago;
+	}
 	
 	public void agregarItem(Producto p) {
 		estado.agregarItem(this, p);
@@ -36,22 +61,21 @@ public class Pedido {
 
 	public void decrementarStock() {
 		// TODO Auto-generated method stub
-		
+		productos.stream().forEach(p -> p.setStock(p.getStock() -1));
 	}
 
 	public void incrementarStock() {
 		// TODO Auto-generated method stub
-		
+		productos.stream().forEach(p -> p.setStock(p.getStock() +1));
 	}
 
 
 	public void reembolsarCostoEnvio() {
-		// TODO Auto-generated method stub
-		
+		// A quien hay que reembolsar? 
 	}
 	
 	public void reembolsarCostoProductos() {
-		
+		// A quien hay que reembolsar? 
 	}
 
 	public void preparar() {

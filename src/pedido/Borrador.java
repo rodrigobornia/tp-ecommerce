@@ -16,6 +16,7 @@ public class Borrador extends EstadoDePedido{
 	
 	@Override
 	public void confirmar(Pedido p) {
+		p.procesarPago();
 		p.setEstado(new Confirmado());
 	}
 	

@@ -1,46 +1,63 @@
 package metodoDePago;
 
-import java.util.Map;
 
 public class TransferenciaBancaria extends MetodoDePago {
-    
-    public interface APITransferenciaBancaria {
-        boolean validarCBU(String cbu, String alias);
-        String ejecutarTransferencia(double monto, String cbuOrigen, String cbuDestino);
-        boolean esTransferenciaProgramada();
+
+    private String cbu;
+    private String alias;
+    private ApiTransferenciaBancaria api;
+
+    public TransferenciaBancaria(
+            double monto,
+            String cbu,
+            String alias,
+            ApiTransferenciaBancaria api) {
+
+        super(monto);
+        this.setCbu(cbu);
+        this.setAlias(alias);
+        this.setApi(api);
     }
-    
-    private APITransferenciaBancaria api;
-    
-    public TransferenciaBancaria(APITransferenciaBancaria api) {
-        this.api = api;
-    }
-    
-    @Override
-    protected void validar(Map<String, Object> datos) throws Exception {
-        String cbuOrigen = (String) datos.get("cbuOrigen");
-        String alias = (String) datos.get("alias");
-        
-        if (!api.validarCBU(cbuOrigen, alias)) {
-            throw new Exception("CBU o alias inválido");
+	@Override
+    protected void validarDatos() {
+        if (!api.validarCuenta(
+                cbu,
+                alias)) {
+            throw new RuntimeException( "Cuenta inválida");
         }
     }
-    
     @Override
-    protected String reservar(double monto, Map<String, Object> datos) throws Exception {
-        return "NO_RESERVA";
-    }
-    
+    protected void reservarFondos() {}//Metodo hook 
     @Override
-    protected String ejecutar(double monto, Map<String, Object> datos, String reservaId) throws Exception {
-        String cbuOrigen = (String) datos.get("cbuOrigen");
-        String cbuDestino = (String) datos.get("cbuDestino");
-        
-        String transaccionId = api.ejecutarTransferencia(monto, cbuOrigen, cbuDestino);
-        
-        if (transaccionId == null || transaccionId.isEmpty()) {
-            throw new Exception("Error al ejecutar la transferencia");
-        }
-        return transaccionId;
+    protected void ejecutarTransaccion() {
+        codigoTransaccion =
+                api.transferir(monto);
     }
+    @Override
+    protected void notificarResultado() {
+
+        super.notificarResultado();
+        System.out.println("Comprobante CBU generado");
+    }
+    private void setApi(ApiTransferenciaBancaria api) {
+    	this.api = api;
+ 	}
+ 	private void setAlias(String alias) {
+ 		this.alias = alias;
+ 	}
+ 	private void setCbu(String cbu) {
+ 		this.cbu = cbu;
+ 	}
+    
+ 	public String getCbu() {
+ 		return cbu;
+ 	}
+ 	public String getAlias() {
+ 		return alias;
+ 	}
+ 	public ApiTransferenciaBancaria getApi() {
+ 		return api;
+ 	}
+    
+    
 }

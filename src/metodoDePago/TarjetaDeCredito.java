@@ -1,53 +1,62 @@
 package metodoDePago;
 
-import java.util.Map;
+import java.time.LocalDate;
 
 public class TarjetaDeCredito extends MetodoDePago {
-    
-    public interface APITarjetaCredito {
-        boolean validarTarjeta(String numero, String cvv, String vencimiento);
-        String preAutorizar(double monto, String numeroTarjeta);
-        String ejecutarPago(double monto, String numeroTarjeta);
-    }
-    
-    private APITarjetaCredito api;
-    
-    public TarjetaDeCredito(APITarjetaCredito api) {
-        this.api = api;
-    }
-    
-    @Override
-    protected void validar(Map<String, Object> datos) throws Exception {
-        String numero = (String) datos.get("numero");
-        String cvv = (String) datos.get("cvv");
-        String vencimiento = (String) datos.get("vencimiento");
-        
-        if (!api.validarTarjeta(numero, cvv, vencimiento)) {
-            throw new Exception("Tarjeta de crédito inválida");
-        }
-    }
-    
-    @Override
-    protected String reservar(double monto, Map<String, Object> datos) throws Exception {
-        String numero = (String) datos.get("numero");
-        String autorizacionId = api.preAutorizar(monto, numero);
-        
-        if (autorizacionId == null || autorizacionId.isEmpty()) {
-            throw new Exception("No se pudo pre-autorizar la tarjeta");
-        }
-        return autorizacionId;
-    }
-    
-    @Override
-    protected String ejecutar(double monto, Map<String, Object> datos, String reservaId) throws Exception {
-        String numero = (String) datos.get("numero");
-        String transaccionId = api.ejecutarPago(monto, numero);
-        
-        if (transaccionId == null || transaccionId.isEmpty()) {
-            throw new Exception("Error al ejecutar el pago con tarjeta");
-        }
-        return transaccionId;
-    }
+	private String numero;
+	private String cvv;
+	private LocalDate vencimiento;
+	private ApiTarjetaCredito api;
+	
+	
+	public TarjetaDeCredito (double monto, String numero, String cvv,
+			LocalDate vencimiento, ApiTarjetaCredito api) {
+		super(monto);
+		this.numero = numero;
+		this.cvv = cvv;
+		this.vencimiento = vencimiento;
+		this.api = api;
+	}
+	
+	@Override
+	protected void validarDatos() {
+        if (!api.validarTarjeta(
+                numero,
+                cvv,
+                vencimiento)) {
 
+            throw new RuntimeException("Tarjeta inválida");
+        }
+	}
+	@Override
+	protected void reservarFondos() {
+		api.preAutorizar(monto);
+		
+	}
+	@Override
+	protected void ejecutarTransaccion() {
+		codigoTransaccion = api.transferir(monto);
+	}
+	@Override
+	protected void notificarResultado() {
+		super.notificarResultado();
+        System.out.println("Cupón generado");	
+	}
 
+	public String getNumero() {
+		return numero;
+	}
+
+	public String getCvv() {
+		return cvv;
+	}
+
+	public LocalDate getVencimiento() {
+		return vencimiento;
+	}
+
+	public ApiTarjetaCredito getApi() {
+		return api;
+	}
+	
 }

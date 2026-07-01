@@ -60,7 +60,9 @@ public abstract class Producto implements Visitable {
 
 	public double getPeso() {
 		return peso;
-	}	
+	}
+
+	public abstract void setStock(int i);	
 	
 	
 		

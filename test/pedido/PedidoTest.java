@@ -2,6 +2,8 @@ package pedido;
 
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import producto.Producto;
+import envio.*;
+import metodoDePago.MetodoDePago;
 
 public class PedidoTest {
     
@@ -24,6 +28,10 @@ public class PedidoTest {
     private GeneradorFactura generadorFacturaMock;
     @Mock
     private Fidelizacion fidelizacionMock;
+    @Mock
+    private CorreoArgentino correoArgentino;
+    @Mock
+    private MetodoDePago metodopagoMock;
 
     private Pedido pedido;
     private NotificadorEmail notificadorEmail;
@@ -32,7 +40,9 @@ public class PedidoTest {
     void setUp() {
     	MockitoAnnotations.openMocks(this);
     	
-        pedido = new Pedido();
+    	List<Producto> sinProductos = new ArrayList<>();
+    	MetodoDeEnvio envioEstandar = new EnvioEstandar(correoArgentino);
+        pedido = new Pedido("",sinProductos, envioEstandar, metodopagoMock);
         notificadorEmail = new NotificadorEmail(mailSenderMock);
         
     }

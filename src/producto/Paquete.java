@@ -45,4 +45,9 @@ public class Paquete extends Producto {
 	public void quitarProducto(Producto producto) {
 	    this.productos.remove(producto);
 	}
+	@Override
+	public void setStock(int i) {
+		// TODO Auto-generated method stub
+		this.setStock(i);
+	}
 }
