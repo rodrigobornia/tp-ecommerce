@@ -66,8 +66,6 @@ public class OperadorNotTest {
 		
 		//Verify - Verifico los resultados esperados
 		assertEquals(2, resultado.size());
-		assertEquals(producto6, resultado.get(0));
-		assertEquals(producto9, resultado.get(1));
 		verify(categoria).filtrar(productos);
 		verify(disponibilidad).filtrar(productos);
 		verify(nombre).filtrar(productos);

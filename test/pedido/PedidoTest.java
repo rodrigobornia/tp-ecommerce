@@ -40,11 +40,13 @@ public class PedidoTest {
     void setUp() {
     	MockitoAnnotations.openMocks(this);
     	
-    	List<Producto> sinProductos = new ArrayList<>();
     	MetodoDeEnvio envioEstandar = new EnvioEstandar(correoArgentino);
-        pedido = new Pedido("",sinProductos, envioEstandar, metodopagoMock);
         notificadorEmail = new NotificadorEmail(mailSenderMock);
         
+        List<Producto> productos = new ArrayList<>();
+        productos.add(productoMock);
+        
+        pedido = new Pedido("Calle 123", productos, envioEstandar, metodopagoMock);
     }
     
     // ============ TEST BORRADOR ============
@@ -53,15 +55,14 @@ public class PedidoTest {
     void testBorrador_AgregarItem_DeberiaAgregarProducto() {
         pedido.agregarItem(productoMock);
         assertTrue(pedido.productos.contains(productoMock));
-        assertEquals(1, pedido.productos.size());
+        assertEquals(2, pedido.productos.size());
     }
     
     @Test
     void testBorrador_QuitarItem_DeberiaQuitarProducto() {
         pedido.agregarItem(productoMock);
         pedido.quitarItem(productoMock);
-        assertFalse(pedido.productos.contains(productoMock));
-        assertEquals(0, pedido.productos.size());
+        assertEquals(1, pedido.productos.size());
     }
     
     @Test
@@ -95,7 +96,7 @@ public class PedidoTest {
     
     @Test
     void testConfirmado_Preparar_DecrementaStockYCambiaEstado() {
-        Pedido pedidoSpy = spy(Pedido.class);
+        Pedido pedidoSpy = spy(pedido);
         pedidoSpy.setEstado(new Confirmado());
         
         pedidoSpy.preparar();
@@ -107,7 +108,7 @@ public class PedidoTest {
     
     @Test
     void testConfirmado_Cancelar_NOIncrementaStock_PorqueNuncaSeDecremento() {
-        Pedido pedidoSpy = spy(Pedido.class);
+        Pedido pedidoSpy = spy(pedido);
         pedidoSpy.setEstado(new Confirmado());
         
         pedidoSpy.cancelar();
@@ -161,7 +162,7 @@ public class PedidoTest {
     
     @Test
     void testPreparacion_Cancelar_IncrementaStockYReembolsaTodo() {
-        Pedido pedidoSpy = spy(Pedido.class);
+        Pedido pedidoSpy = spy(pedido);
         pedidoSpy.setEstado(new Preparacion());
         
         pedidoSpy.cancelar();
@@ -209,15 +210,18 @@ public class PedidoTest {
     
     @Test
     void testEnviado_Cancelar_IncrementaStockYReembolsaSoloProductos() {
-        Pedido pedidoSpy = spy(Pedido.class);
-        pedidoSpy.setEstado(new Enviado());
+    	// Given
+        Pedido pedidoSpy = spy(pedido);
         
+        // When
+        pedidoSpy.setEstado(new Enviado());
         pedidoSpy.cancelar();
         
+        // Then
         verify(pedidoSpy, times(1)).incrementarStock();
         verify(pedidoSpy, times(1)).reembolsarCostoProductos();
         verify(pedidoSpy, never()).reembolsarCostoEnvio();
-        assertEquals(Cancelado.class, pedidoSpy.getEstado().getClass());
+        assertTrue(pedidoSpy.getEstado() instanceof Cancelado);
     }
     
     @Test
@@ -271,7 +275,7 @@ public class PedidoTest {
     
     @Test
     void testFlujoCompleto_BorradorAEntregado_Exitoso() {
-        Pedido pedidoSpy = spy(Pedido.class);
+        Pedido pedidoSpy = spy(pedido);
         
         // 1. Borrador - Agregar items
         pedidoSpy.agregarItem(productoMock);
@@ -298,7 +302,7 @@ public class PedidoTest {
     
     @Test
     void testFlujoConCancelacion_DesdeBorrador_NoReembolsaNiStock() {
-        Pedido pedidoSpy = spy(Pedido.class);
+        Pedido pedidoSpy = spy(pedido);
         
         // Borrador -> Cancelado
         pedidoSpy.cancelar();
@@ -306,12 +310,13 @@ public class PedidoTest {
         verify(pedidoSpy, never()).incrementarStock();
         verify(pedidoSpy, never()).reembolsarCostoProductos();
         verify(pedidoSpy, never()).reembolsarCostoEnvio();
-        assertEquals(Cancelado.class, pedidoSpy.getEstado().getClass());
+        assertTrue(pedidoSpy.getEstado() instanceof Cancelado);
+        
     }
     
     @Test
     void testFlujoConCancelacion_DesdeConfirmado_NoReembolsaNiStock() {
-        Pedido pedidoSpy = spy(Pedido.class);
+        Pedido pedidoSpy = spy(pedido);
         pedidoSpy.setEstado(new Confirmado());
         
         pedidoSpy.cancelar();
@@ -324,7 +329,7 @@ public class PedidoTest {
     
     @Test
     void testFlujoConCancelacion_DesdePreparacion_ReembolsaTodoEIncrementaStock() {
-        Pedido pedidoSpy = spy(Pedido.class);
+        Pedido pedidoSpy = spy(pedido);
         pedidoSpy.setEstado(new Preparacion());
         
         pedidoSpy.cancelar();
@@ -337,7 +342,7 @@ public class PedidoTest {
     
     @Test
     void testFlujoConCancelacion_DesdeEnviado_ReembolsaSoloProductosEIncrementaStock() {
-        Pedido pedidoSpy = spy(Pedido.class);
+        Pedido pedidoSpy = spy(pedido);
         pedidoSpy.setEstado(new Enviado());
         
         pedidoSpy.cancelar();

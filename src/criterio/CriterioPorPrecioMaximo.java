@@ -24,13 +24,13 @@ public class CriterioPorPrecioMaximo implements Criterio {
 	@Override
 	public void agregar(Criterio criterio) {
 		// TODO Auto-generated method stub
-		
+		// Este método está vacío porque es una hoja en el patrón Composite
 	}
 
 	@Override
 	public void eliminar(Criterio criterio) {
 		// TODO Auto-generated method stub
-		
+		// Este método está vacío porque es una hoja en el patrón Composite
 	}
 
 }
