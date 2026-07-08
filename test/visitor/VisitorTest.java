@@ -1,7 +1,7 @@
 package visitor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -12,140 +12,160 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import ecommerce.Ecommerce;
+import pedido.Borrador;
+import pedido.Entregado;
 import pedido.Pedido;
-import producto.Paquete;
+import producto.Producto;
 import producto.ProductoBase;
 
 class VisitorTest {
 
-    private Pedido pedidoValido1;
-    private Pedido pedidoValido2;
-    private Pedido pedidoFueraDeFecha;
+    private GeneradorReporteVentas generador;
     
-    private ProductoBase termoMock;
-    private Paquete comboMock;
+    private ProductoBase termo;
+    private ProductoBase mate;
     
-    private List<Pedido> historialMock;
+    private Pedido pedidoValido;
+    private Pedido pedidoViejo;
+    private Pedido pedidoNoEntregado;
+ 
+    private Ecommerce ecommerce;
+    private List<Producto> catalogo;
+    private List<Pedido> historial;
 
     @BeforeEach
     void setUp() {
-        // 1. Mockeamos los productos que se van a vender
-        termoMock = mock(ProductoBase.class);
-        when(termoMock.getNombre()).thenReturn("Termo Stanley");
-        when(termoMock.precioFinal()).thenReturn(5000.0); // Precio al que se vendió
-
-        comboMock = mock(Paquete.class);
-        when(comboMock.getNombre()).thenReturn("Combo Mate");
-        when(comboMock.precioFinal()).thenReturn(8000.0);
-
-        // 2. Mockeamos los pedidos simulando sus fechas y su contenido
-        // Pedido 1: Se hizo en enero, llevó 2 Termos y 1 Combo
-        pedidoValido1 = mock(Pedido.class);
-        when(pedidoValido1.getFecha()).thenReturn(LocalDate.of(2023, 1, 10));
-        when(pedidoValido1.getProductos()).thenReturn(Arrays.asList(termoMock, termoMock, comboMock));
-
-        // Pedido 2: Se hizo a fin de enero, llevó 1 Termo
-        pedidoValido2 = mock(Pedido.class);
-        when(pedidoValido2.getFecha()).thenReturn(LocalDate.of(2023, 1, 25));
-        when(pedidoValido2.getProductos()).thenReturn(Arrays.asList(termoMock));
-
-        // Pedido 3: Fuera del rango de búsqueda (Febrero), llevó 1 Combo (No debería sumarse)
-        pedidoFueraDeFecha = mock(Pedido.class);
-        when(pedidoFueraDeFecha.getFecha()).thenReturn(LocalDate.of(2023, 2, 5));
-        when(pedidoFueraDeFecha.getProductos()).thenReturn(Arrays.asList(comboMock));
-
-        // Armamos el historial completo
-        historialMock = Arrays.asList(pedidoValido1, pedidoValido2, pedidoFueraDeFecha);
-    }
-
-    // =========================================================================
-    // TESTS DEL NÚCLEO MATEMÁTICO (VISITOR)
-    // =========================================================================
-
-    @Test
-    void testRecolectorCalculaEstadisticasYOrdenaCorrectamente() {
-        // Buscamos ventas solo de Enero
-        LocalDate inicio = LocalDate.of(2023, 1, 1);
-        LocalDate fin = LocalDate.of(2023, 1, 31);
-        
-        RecolectorVentasVisitor recolector = new RecolectorVentasVisitor(historialMock, inicio, fin);
-        
-        // Simulamos que el ECommerce hace el accept pasándole el visitor
-        recolector.visitProductoBase(termoMock);
-        recolector.visitPaquete(comboMock);
-        
-        List<ItemReporteDTO> resultados = recolector.getResultadosOrdenados();
-        
-        // Verificaciones
-        assertEquals(2, resultados.size(), "Debería haber 2 ítems en el reporte");
-        
-        // Como se vendieron 3 Termos y 1 Combo en Enero, el Termo debe estar primero (índice 0)
-        ItemReporteDTO masVendido = resultados.get(0);
-        assertEquals("Termo Stanley", masVendido.getNombreItem());
-        assertEquals(3, masVendido.getUnidadesVendidas()); // 2 del pedido1 + 1 del pedido2
-        assertEquals(5000.0, masVendido.getPrecioPromedioCobrado());
-        
-        ItemReporteDTO segundoVendido = resultados.get(1);
-        assertEquals("Combo Mate", segundoVendido.getNombreItem());
-        assertEquals(1, segundoVendido.getUnidadesVendidas()); // 1 del pedido1 (el de febrero se ignora)
-        assertEquals(8000.0, segundoVendido.getPrecioPromedioCobrado());
-    }
-
-    // =========================================================================
-    // TESTS DE LOS FORMATOS (STRATEGIES)
-    // =========================================================================
-
-    @Test
-    void testExportadorCSV() {
-        List<ItemReporteDTO> datos = Arrays.asList(
-            new ItemReporteDTO("Termo", 5, 1000.0)
-        );
-        
-        ExportadorReporte exportador = new ExportadorCSV();
-        String resultado = exportador.exportar(datos);
-        
-        System.out.println("\n=== REPORTE CSV GENERADO ===");
-        System.out.println(resultado);
-        System.out.println("============================\n");
-        
-        assertTrue(resultado.contains("Nombre_Item,Unidades_Vendidas,Precio_Promedio"));
-        assertTrue(resultado.contains("Termo,5,1000,00") || resultado.contains("Termo,5,1000.00")); 
-    }
-
-    @Test
-    void testExportadorTXT() {
-        List<ItemReporteDTO> datos = Arrays.asList(
-            new ItemReporteDTO("Mate", 2, 500.0)
-        );
-        
-        ExportadorReporte exportador = new ExportadorTXT();
-        String resultado = exportador.exportar(datos);
-       
-        System.out.println("\n=== REPORTE TXT GENERADO ===");
-        System.out.println(resultado);
-        System.out.println("============================\n");
-        
-        assertTrue(resultado.contains("=== REPORTE DE VENTAS ==="));
-        assertTrue(resultado.contains("- Mate"));
-        assertTrue(resultado.contains("Unidades: 2"));
-    }
-    @Test
-    void testExportadorHTML() {
-        List<ItemReporteDTO> datos = Arrays.asList(
-            new ItemReporteDTO("Bombilla", 10, 200.0)
-        );
-        
-        ExportadorReporte exportador = new ExportadorHTML();
-        String resultado = exportador.exportar(datos);
-        
-   
-        System.out.println("\n=== REPORTE HTML GENERADO ===");
-        System.out.println(resultado);
-        System.out.println("=============================\n");
-
-        assertTrue(resultado.contains("<!DOCTYPE html>"));
-        assertTrue(resultado.contains("<td>Bombilla</td>"));
-        assertTrue(resultado.contains("<td>10</td>"));
+    	
     
+        generador = new GeneradorReporteVentas();
+
+        // 1. Creamos productos reales para que la matemática interna funcione perfecta
+        termo = new ProductoBase(1, "Termo Stanley", "Verde", "Stanley", "Bazar", 5000.0, 0, 10);
+        mate = new ProductoBase(2, "Mate de Cuero", "Negro", "Generico", "Bazar", 1000.0, 0, 10);
+        
+        catalogo = Arrays.asList(termo, mate);
+
+        // 2. Mockeamos los pedidos simulando distintos escenarios
+        
+        // A) Pedido Perfecto: En fecha (Junio) y Entregado. Llevó 2 termos y 1 mate.
+        pedidoValido = mock(Pedido.class);
+        when(pedidoValido.getEstado()).thenReturn(new Entregado());
+        when(pedidoValido.getFecha()).thenReturn(LocalDate.of(2023, 6, 15));
+        when(pedidoValido.getProductos()).thenReturn(Arrays.asList(termo, termo, mate));
+
+        // B) Pedido Fuera de Rango: Entregado, pero en Enero (No debe salir en el reporte)
+        pedidoViejo = mock(Pedido.class);
+        when(pedidoViejo.getEstado()).thenReturn(new Entregado());
+        when(pedidoViejo.getFecha()).thenReturn(LocalDate.of(2023, 1, 10));
+        when(pedidoViejo.getProductos()).thenReturn(Arrays.asList(mate, mate));
+
+        // C) Pedido No Entregado: En fecha (Junio), pero en Borrador (No debe salir)
+        pedidoNoEntregado = mock(Pedido.class);
+        when(pedidoNoEntregado.getEstado()).thenReturn(new Borrador());
+        when(pedidoNoEntregado.getFecha()).thenReturn(LocalDate.of(2023, 6, 20));
+        when(pedidoNoEntregado.getProductos()).thenReturn(Arrays.asList(termo));
+
+        historial = Arrays.asList(pedidoValido, pedidoViejo, pedidoNoEntregado);
+       
+        ecommerce = new Ecommerce();
+        
+        // Le cargamos los productos
+        catalogo.forEach(p -> ecommerce.agregarProductoACatalogo(p));
+        
+        // Le cargamos los pedidos mockeados
+        historial.forEach(p -> ecommerce.agregarPedido(p));
+    }
+
+    @Test
+    void testGenerarReporte_FiltraYCalculaBien_FormatoCSV() {
+        // Rango de búsqueda: Solo el mes de Junio
+        LocalDate desde = LocalDate.of(2023, 6, 1);
+        LocalDate hasta = LocalDate.of(2023, 6, 30);
+        
+        ReporteVisitor visitorCSV = new ReporteCSV();
+        
+        String resultado = generador.generar(historial, catalogo, desde, hasta, visitorCSV);
+        
+        // IMPRESIÓN PARA VERLO EN CONSOLA
+        System.out.println("=== REPORTE CSV ===");
+        System.out.println(resultado);
+        
+        // VERIFICACIONES
+        // 1.  encabezado
+        assertTrue(resultado.contains("Nombre,UnidadesVendidas,PrecioPromedio"));
+        
+        // 2. Termo se vendió 2 veces a 5000 (Solo suma el pedidoValido)
+        assertTrue(resultado.contains("Termo Stanley,2,5000"));
+        
+        // 3. Mate se vendió 1 vez a 1000 (El pedido de Enero se ignoró)
+        assertTrue(resultado.contains("Mate de Cuero,1,1000"));
+    }
+
+    @Test
+    void testGenerarReporte_FormatoHTML() {
+        LocalDate desde = LocalDate.of(2023, 6, 1);
+        LocalDate hasta = LocalDate.of(2023, 6, 30);
+        
+        ReporteVisitor visitorHTML = new ReporteHTML();
+        
+        String resultado = generador.generar(historial, catalogo, desde, hasta, visitorHTML);
+        
+        System.out.println("\n=== REPORTE HTML ===");
+        System.out.println(resultado);
+        
+        // Verificamos etiquetas HTML y datos
+        assertTrue(resultado.contains("<td>Termo Stanley</td>"));
+        assertTrue(resultado.contains("<td>2</td>")); // Unidades
+        assertTrue(resultado.contains("<td>$5000"));  // Precio Promedio
+        assertTrue(resultado.endsWith("</table>\n"));
+    }
+
+    @Test
+    void testGenerarReporte_FormatoTXT() {
+        LocalDate desde = LocalDate.of(2023, 6, 1);
+        LocalDate hasta = LocalDate.of(2023, 6, 30);
+        
+        ReporteVisitor visitorTXT = new ReporteTXT();
+        
+        String resultado = generador.generar(historial, catalogo, desde, hasta, visitorTXT);
+        
+        System.out.println("\n=== REPORTE TXT ===");
+        System.out.println(resultado);
+        
+        assertTrue(resultado.contains("Termo Stanley - Unidades vendidas: 2 - Precio promedio: $5000"));
+        assertTrue(resultado.contains("Mate de Cuero - Unidades vendidas: 1 - Precio promedio: $1000"));
+    }
+    
+    @Test
+    void testGenerarReporte_SinVentasEnEsePeriodo() {
+        // Rango de búsqueda: Diciembre (no hay ventas acá)
+        LocalDate desde = LocalDate.of(2023, 12, 1);
+        LocalDate hasta = LocalDate.of(2023, 12, 31);
+        
+        ReporteVisitor visitorTXT = new ReporteTXT();
+        
+        String resultado = generador.generar(historial, catalogo, desde, hasta, visitorTXT);
+        
+        // El reporte debería estar vacío porque ningún producto pasó el filtro de "unidadesVendidas > 0"
+        assertTrue(resultado.isEmpty(), "El reporte debería estar vacío si no hay ventas");
+    }
+    @Test
+    void testGenerarReporte_A_Traves_Del_Ecommerce() {
+        
+        LocalDate desde = LocalDate.of(2023, 6, 1);
+        LocalDate hasta = LocalDate.of(2023, 6, 30);
+        ReporteVisitor visitorTXT = new ReporteTXT();
+        
+        // When - Le pedimos a la tienda que se encargue de todo
+        String resultado = ecommerce.generarReporte(desde, hasta, visitorTXT);
+        
+        // IMPRESIÓN PARA VERLO EN CONSOLA
+        System.out.println("\n=== REPORTE GENERADO DESDE ECOMMERCE (FACADE) ===");
+        System.out.println(resultado);
+        
+        // Then - Verificamos que delegue bien y arme el texto correcto
+        assertTrue(resultado.contains("Termo Stanley - Unidades vendidas: 2"));
+        assertTrue(resultado.contains("Mate de Cuero - Unidades vendidas: 1"));
     }
 }

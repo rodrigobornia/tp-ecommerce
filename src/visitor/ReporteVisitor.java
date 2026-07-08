@@ -7,5 +7,6 @@ public interface ReporteVisitor {
 
 	public void visitProductoBase(ProductoBase productoBase);
 	public void visitPaquete (Paquete paquete);
+	public String obtenerResultado();
 
 }

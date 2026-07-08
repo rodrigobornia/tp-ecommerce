@@ -1,5 +1,6 @@
 package ecommerce;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +9,9 @@ import envio.MetodoDeEnvio;
 import metodoDePago.MetodoDePago;
 import pedido.Pedido;
 import producto.Producto;
-import visitor.ExportadorReporte;
-import visitor.ItemReporteDTO;
-import visitor.RecolectorVentasVisitor;
+
+import visitor.GeneradorReporteVentas;
+
 import visitor.ReporteVisitor;
 
 public class Ecommerce {
@@ -18,7 +19,7 @@ public class Ecommerce {
 	private List<Producto> catalogo = new ArrayList<>();
 	private List<Pedido> pedidos = new ArrayList<>();
 	
-	
+	GeneradorReporteVentas generador = new GeneradorReporteVentas();
 	
 	public Ecommerce() {
 		super();
@@ -28,15 +29,15 @@ public class Ecommerce {
 		return criterio.filtrar(this.catalogo);
 	}
 
-    // =======================================================
-    // GESTIÓN DEL CATÁLOGO Y PEDIDOS
-    // =======================================================
-    
 	public void crearPedido(String direccion, List<Producto> productos, MetodoDeEnvio metodoEnvio,
 							MetodoDePago metodoPago) {
 		Pedido nuevoPedido = new Pedido(direccion,productos,metodoEnvio,metodoPago);
 		this.agregarPedido(nuevoPedido);
 	}
+	// =======================================================
+	// GESTIÓN DEL CATÁLOGO Y PEDIDOS
+	// =======================================================
+	
 	
 	public void agregarPedido(Pedido p) {
 		pedidos.add(p);
@@ -53,32 +54,11 @@ public class Ecommerce {
 	public void quitarProductoDeCatalogo(Producto p) {
 		catalogo.remove(p);
 	}
-	 // =======================================================
-    // GENERACIÓN DE REPORTES (Visitor + Strategy)
-    // =======================================================
-    
-    /**
-     * Genera un reporte aplicando el patrón Visitor para la recolección 
-     * y el patrón Strategy para la exportación.
-     */
-    public String generarReporte(ReporteVisitor visitor, ExportadorReporte exportador) {
+	public String generarReporte(LocalDate desde, LocalDate hasta, ReporteVisitor visitor) {
+       
         
-        // 1. Double Dispatch: El E-Commerce le pasa el visitor a cada elemento del catálogo
-        for (Producto item : this.catalogo) {
-            item.accept(visitor);
-        }
-        
-        // 2. Extracción de datos: Verificamos la instancia concreta para obtener los DTOs
-        if (visitor instanceof RecolectorVentasVisitor) {
-            RecolectorVentasVisitor recolector = (RecolectorVentasVisitor) visitor;
-            List<ItemReporteDTO> datosListos = recolector.getResultadosOrdenados();
-            
-            // 3. Strategy: Delegamos la responsabilidad del formato al exportador elegido
-            return exportador.exportar(datosListos);
-        }
-        
-        // Retorno por defecto de seguridad
-        return "El reporte no pudo ser generado con el formato solicitado.";
+ 
+        return generador.generar(this.pedidos, this.catalogo, desde, hasta, visitor);
     }
-}
+} 
 

@@ -26,6 +26,7 @@ public class Pedido {
 		this.productos = productos;
 		this.metodoEnvio = metodoEnvio;
 		this.metodoPago = metodoPago;
+		this.fecha = LocalDate.now();
 	}
 	
 	public void procesarPago() {
