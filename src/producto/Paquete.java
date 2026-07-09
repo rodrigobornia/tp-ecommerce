@@ -51,5 +51,10 @@ public class Paquete extends Producto {
 		return this.productos.stream().mapToInt(p->p.getStock()).min().orElse(0); 
 		//En caso de lista vacia retorna el 0 
 	}
+	
+	@Override 
+	public void setStock(int i) {
+		this.productos.stream().forEach(p->p.setStock(i));
+	}
 
 }

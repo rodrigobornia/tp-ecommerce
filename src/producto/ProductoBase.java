@@ -69,7 +69,7 @@ public class ProductoBase extends Producto {
 
 	public void setStock(int i) {
 		// TODO Auto-generated method stub
-		this.setStock(i);
+		this.stock = this.getStock() + i;
 	}
 
 }

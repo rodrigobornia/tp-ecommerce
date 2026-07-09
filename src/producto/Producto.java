@@ -74,4 +74,6 @@ public abstract class Producto{
 	    this.unidadesVendidas += cantidad;
 	    this.sumaPreciosCobrados += precioCobrado;
 	}
+
+	public abstract void setStock(int i);
 }
