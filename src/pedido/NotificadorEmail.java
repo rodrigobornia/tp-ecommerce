@@ -25,7 +25,7 @@ public class NotificadorEmail implements ObservadorPedido {
 
 	private boolean transicionValida(EstadoDePedido nuevo) {
 		// TODO Auto-generated method stub
-		return nuevo instanceof Confirmado || nuevo instanceof Enviado || nuevo instanceof Entregado;
+		return nuevo.estaConfirmado() || nuevo.estaEnviado() || nuevo.estaEntregado();
 	}
 
 }
