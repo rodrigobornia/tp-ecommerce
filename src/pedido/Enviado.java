@@ -3,6 +3,11 @@ package pedido;
 public class Enviado extends EstadoDePedido {
 
 	@Override
+	public boolean estaEnviado() {
+		return true;
+	}
+	
+	@Override
 	public void entregar(Pedido pe) {
 		pe.setEstado(new Entregado());
 	}

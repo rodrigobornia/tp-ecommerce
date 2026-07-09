@@ -221,7 +221,7 @@ public class PedidoTest {
         verify(pedidoSpy, times(1)).incrementarStock();
         verify(pedidoSpy, times(1)).reembolsarCostoProductos();
         verify(pedidoSpy, never()).reembolsarCostoEnvio();
-        assertTrue(pedidoSpy.getEstado() instanceof Cancelado);
+        assertTrue(pedidoSpy.getEstado().estaCancelado());
     }
     
     @Test
@@ -310,7 +310,7 @@ public class PedidoTest {
         verify(pedidoSpy, never()).incrementarStock();
         verify(pedidoSpy, never()).reembolsarCostoProductos();
         verify(pedidoSpy, never()).reembolsarCostoEnvio();
-        assertTrue(pedidoSpy.getEstado() instanceof Cancelado);
+        assertTrue(pedidoSpy.getEstado().estaCancelado());
         
     }
     
