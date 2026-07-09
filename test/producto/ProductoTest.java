@@ -67,7 +67,7 @@ class ProductoTest {
         ProductoBase p1 = new ProductoBase(1, "P1", "-", "M1", "C1", 1000.0, 0, 10);
         ProductoBase p2 = new ProductoBase(2, "P2", "-", "M2", "C1", 2000.0, 0, 10);
         
-        Paquete paquete = new Paquete("Combo", "Desc", "Cat", 0.0, 0, 5);
+        Paquete paquete = new Paquete("Combo", "Desc", "Cat", 0.0, 0);
         paquete.agregarProducto(p1);
         paquete.agregarProducto(p2);
         
@@ -80,7 +80,7 @@ class ProductoTest {
         ProductoBase p2 = new ProductoBase(2, "P2", "-", "M2", "C1", 2000.0, 0, 10);
         
         // Paquete con 10% de descuento
-        Paquete paquete = new Paquete("Combo", "Desc", "Cat", 0.0, 10, 5);
+        Paquete paquete = new Paquete("Combo", "Desc", "Cat", 0.0, 10);
         paquete.agregarProducto(p1);
         paquete.agregarProducto(p2);
         

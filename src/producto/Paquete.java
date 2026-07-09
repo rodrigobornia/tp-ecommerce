@@ -10,9 +10,9 @@ public class Paquete extends Producto {
 	private List<Producto> productos = new ArrayList<>(); 
 	
 	
-	public Paquete(String nombre, String descripcion, String categoria, double precio, int descuento, int stock) {
+	public Paquete(String nombre, String descripcion, String categoria, double precio, int descuento) {
 	    
-	    super(nombre, descripcion, categoria, precio, descuento, stock); 
+	    super(nombre, descripcion, categoria, precio, descuento); 
 	}
 	@Override
 	public void accept(ReporteVisitor visitor) {
@@ -45,9 +45,11 @@ public class Paquete extends Producto {
 	public void quitarProducto(Producto producto) {
 	    this.productos.remove(producto);
 	}
+	
 	@Override
-	public void setStock(int i) {
-		// TODO Auto-generated method stub
-		this.setStock(i);
+	public int getStock() {
+		return this.productos.stream().mapToInt(p->p.getStock()).min().orElse(0); 
+		//En caso de lista vacia retorna el 0 
 	}
+
 }

@@ -6,7 +6,6 @@ public abstract class Producto{
 	private  String nombre;
 	private  String descripcion;
 	private  double precioBase;
-	private  int stock;
 	private double peso;
 	private String categoria;
 	private int descuento;
@@ -15,12 +14,11 @@ public abstract class Producto{
 	protected double sumaPreciosCobrados = 0.0;
 
 
-	public Producto(String nombre, String descripcion, String categoria, double precioBase,int descuento, int stock) {
+	public Producto(String nombre, String descripcion, String categoria, double precioBase,int descuento) {
 	    this.nombre = nombre;
 	    this.descripcion = descripcion;
 	    this.precioBase = precioBase;
 	    this.descuento = descuento;
-	    this.stock = stock;
 	    this.categoria = categoria;
 	}  
 	
@@ -29,7 +27,7 @@ public abstract class Producto{
 	
 	public abstract void accept(ReporteVisitor visitor);
 	
-	
+	public abstract int getStock();
 	
 	//GETTERS----------------------------------------
 	public int getDescuento() {
@@ -49,9 +47,6 @@ public abstract class Producto{
 	public double getPrecioBase() {
 		return precioBase;
 	}
-	public int getStock() {
-		return stock;
-	}
 
 	public String getCategoria() {
 		return categoria;
@@ -60,8 +55,6 @@ public abstract class Producto{
 	public double getPeso() {
 		return peso;
 	}
-
-	public abstract void setStock(int i);	
 	
 
 	public int getUnidadesVendidas() {

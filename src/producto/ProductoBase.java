@@ -7,6 +7,7 @@ import visitor.ReporteVisitor;
 public class ProductoBase extends Producto {
 	private int SKU;		
 	private String marca;
+	private int stock;
 	
 	private ArrayList<AtributoDinamico> atributos = new ArrayList<AtributoDinamico>();
 	
@@ -14,9 +15,10 @@ public class ProductoBase extends Producto {
 	
 	
 	public ProductoBase(int SKU, String nombre, String descripcion,String marca, String categoria, Double precio, int descuento,int stock) {
-	super(nombre, descripcion, categoria, precio, descuento ,stock); // <-- Pasamos los datos al padre
+	super(nombre, descripcion, categoria, precio, descuento); // <-- Pasamos los datos al padre
 	this.SKU = SKU;
 	this.marca = marca;
+	this.stock = stock;
 }
 
 	@Override 
@@ -59,8 +61,12 @@ public class ProductoBase extends Producto {
 	public ArrayList<AtributoDinamico> getAtributos() {
 		return atributos;
 	}
-
+	
 	@Override
+	public int getStock() {
+		return this.stock;
+	}
+
 	public void setStock(int i) {
 		// TODO Auto-generated method stub
 		this.setStock(i);
