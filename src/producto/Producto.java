@@ -1,12 +1,8 @@
 package producto;
 
-
-
 import visitor.ReporteVisitor;
-import visitor.Visitable;
 
-
-public abstract class Producto implements Visitable {
+public abstract class Producto{
 	private  String nombre;
 	private  String descripcion;
 	private  double precioBase;
@@ -14,6 +10,9 @@ public abstract class Producto implements Visitable {
 	private double peso;
 	private String categoria;
 	private int descuento;
+	//  venta 
+	protected int unidadesVendidas = 0;
+	protected double sumaPreciosCobrados = 0.0;
 
 
 	public Producto(String nombre, String descripcion, String categoria, double precioBase,int descuento, int stock) {
@@ -64,8 +63,22 @@ public abstract class Producto implements Visitable {
 
 	public abstract void setStock(int i);	
 	
+
+	public int getUnidadesVendidas() {
+	    return this.unidadesVendidas;
+	}
+		
+	public double precioPromedio() {
+	    if (this.unidadesVendidas == 0) return 0.0;
+	    return this.sumaPreciosCobrados / this.unidadesVendidas;
+	}	
 	
-		
-		
- 
+	public void reiniciarVentas() {
+	    this.unidadesVendidas = 0;
+	    this.sumaPreciosCobrados = 0.0;
+	}
+	public void registrarVenta(int cantidad, double precioCobrado) {
+	    this.unidadesVendidas += cantidad;
+	    this.sumaPreciosCobrados += precioCobrado;
+	}
 }
